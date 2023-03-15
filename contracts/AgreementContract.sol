@@ -25,9 +25,4 @@ contract AgreementContract {
         return (vt.actorAddress,vt.userConsent); // 返回投票信息及行为人地址
     }
 
-    //判断用户同意结果
-    function isActorAuthorized(bytes32 _id) public view returns (bool){
-        return voteMap[_id].userConsent;
-    }
-
 }
