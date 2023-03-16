@@ -39,7 +39,7 @@ contract VerificationContract {
         if (!CompareArray(personalDataList,processedData)) {
             return logActorId;
         }
-        return logActorId;
+        return address(0);
     }
 
     function CompareArray(string[] memory personalDataList,string[] memory operatedData) internal pure returns(bool){

@@ -25,6 +25,7 @@ contract LogContract {
     function logAction(address _actorId,Operator _operation, string[] memory _processedData, string memory _serviceName) public returns(uint){
         ++currentLog;
         logList[currentLog] = LogEntry(currentLog,_actorId,_operation, _processedData, _serviceName); // 将新的日志加入mapping
+        emit record(currentLog,_actorId,_operation, _processedData, _serviceName);
         return currentLog;
     }
 
