@@ -35,6 +35,10 @@ contract VerificationContract {
             return logActorId;
         } 
 
+        if(personalDataList.length != processedData.length){
+            return logActorId;
+        }
+
         // 检查个人数据是否已经被确认
         if (!CompareArray(personalDataList,processedData)) {
             return logActorId;
