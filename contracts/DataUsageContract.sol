@@ -18,9 +18,9 @@ contract DataUsageContract {
     struct Purpose {
         bytes32 id ; //
         address actorId; // 行为人地址作为id
+        Operator operation; // 操作  “read”, “write” and “transfer”
         string serviceName; // 服务名称
         string servicePurpose; // 服务目的
-        Operator operation; // 操作  “read”, “write” and “transfer”
         string[] personalDataList; // 个人数据列表
     }
 
@@ -34,7 +34,7 @@ contract DataUsageContract {
         require(_personalDataList.length <= 256,"The length of the data list cannot exceed 256");
         address actorId = msg.sender;
         bytes32 id = keccak256(abi.encode(actorId, _serviceName, _servicePurpose, _operation));
-        purposeMap[id] = Purpose(id, actorId, _serviceName, _servicePurpose, _operation, _personalDataList);
+        purposeMap[id] = Purpose(id, actorId, _operation,_serviceName, _servicePurpose, _personalDataList);
         return id;
     }
 
