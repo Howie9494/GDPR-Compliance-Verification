@@ -11,7 +11,7 @@ contract VerificationContract {
     AgreementContract private agreementContract;
     LogContract private logContract;
     DataUsageContract private dataUsageContract;  
-    bool internal locked = false;
+    bool private locked = false;
 
     constructor(address _agreementContract, address _logContract, address _dataUsageContract) {
         agreementContract = AgreementContract(_agreementContract);
