@@ -53,10 +53,13 @@ contract VerificationContract {
     }
 
     function CompareArray(string[] memory personalDataList,string[] memory operatedData) internal pure returns(bool){
+        uint bitMap = 0;
+        require(personalDataList.length <= 256);
         for(uint i = 0;i < operatedData.length;i++){
             bool flag = false;
             for(uint j = 0;j < personalDataList.length;j++){
-                if(isEqual(operatedData[i],personalDataList[j])){
+                if(isEqual(operatedData[i],personalDataList[j]) && (bitMap & (1 << j)) == 0){
+                    bitMap = bitMap | (1 << j);
                     flag = true;
                     break;
                 }
