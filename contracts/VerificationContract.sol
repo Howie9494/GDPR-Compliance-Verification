@@ -10,7 +10,8 @@ contract VerificationContract {
 
     AgreementContract private agreementContract;
     LogContract private logContract;
-    DataUsageContract private dataUsageContract;   
+    DataUsageContract private dataUsageContract;  
+    bool private locked = false;
 
     constructor(address _agreementContract, address _logContract, address _dataUsageContract) {
         agreementContract = AgreementContract(_agreementContract);
@@ -18,11 +19,15 @@ contract VerificationContract {
         dataUsageContract = DataUsageContract(_dataUsageContract);
     }
 
-    function verify(uint _logId) public view returns(address) {
+    function verify(uint _logId) public returns(address) {
+        require(!locked);
+        locked = true;
         // 获取日志信息
         (address logActorId,Operator logOperation, string[] memory processedData,bytes32 contractId) = logContract.getLog(_logId);
         // （1）检查行为人是否符合协议
         (address agreementActorAddress,bool userConsent) = agreementContract.getVote(contractId);
+        (Operator dataUseOperation, string[] memory personalDataList) = dataUsageContract.getPurpose(contractId);
+        locked = false;
 
         if (agreementActorAddress != logActorId) {
             return logActorId;
@@ -30,7 +35,6 @@ contract VerificationContract {
 
         // 日志合同所记录的每个行为者的操作是否符合那些通过数据使用合同记录并通过协议合同获得用户同意的操作
         // 检查操作是否符合数据使用合同 && 检查该行为人是否已经在ProtocolContract中记录了同意
-         (Operator dataUseOperation, string[] memory personalDataList) = dataUsageContract.getActor(contractId);
         if ((dataUseOperation != logOperation) || (!userConsent)) {
             return logActorId;
         } 
@@ -47,10 +51,13 @@ contract VerificationContract {
     }
 
     function CompareArray(string[] memory personalDataList,string[] memory operatedData) internal pure returns(bool){
+        uint bitMap = 0;
+        require(personalDataList.length <= 256);
         for(uint i = 0;i < operatedData.length;i++){
             bool flag = false;
             for(uint j = 0;j < personalDataList.length;j++){
-                if(isEqual(operatedData[i],personalDataList[j])){
+                if(isEqual(operatedData[i],personalDataList[j]) && (bitMap & (1 << j)) == 0){
+                    bitMap = bitMap | (1 << j);
                     flag = true;
                     break;
                 }

@@ -15,37 +15,33 @@ import "./enum.sol";
     
 contract DataUsageContract {
     // 行为人结构体，用于记录行为人的信息
-    struct Actor {
+    struct Purpose {
         bytes32 id ; //
         address actorId; // 行为人地址作为id
+        Operator operation; // 操作  “read”, “write” and “transfer”
         string serviceName; // 服务名称
         string servicePurpose; // 服务目的
-        Operator operation; // 操作  “read”, “write” and “transfer”
         string[] personalDataList; // 个人数据列表
     }
 
     // 使用 mapping 存储所有行为人的信息，以ID为索引
-    mapping(bytes32 => Actor) private actorMap;
+    mapping(bytes32 => Purpose) private purposeMap;
 
     // 添加新的行为人信息
-    function addActor(string memory _serviceName, string memory _servicePurpose, Operator _operation, string[] memory _personalDataList) public returns(bytes32) {
+    function addPurpose(string memory _serviceName, string memory _servicePurpose, Operator _operation, string[] memory _personalDataList) public returns(bytes32) {
         //require(!actorExists(_actorId), "Actor already exists");
         // 拼接 actorId ，serviceName，servicePurpose，operation
+        require(_personalDataList.length <= 256,"The length of the data list cannot exceed 256");
         address actorId = msg.sender;
         bytes32 id = keccak256(abi.encode(actorId, _serviceName, _servicePurpose, _operation));
-        actorMap[id] = Actor(id, actorId, _serviceName, _servicePurpose, _operation, _personalDataList);
+        purposeMap[id] = Purpose(id, actorId, _operation,_serviceName, _servicePurpose, _personalDataList);
         return id;
     }
 
     // 获取指定行为人的信息
-    function getActor(bytes32 _id) public view returns (Operator, string[] memory) {
-        require(actorExists(_id), "Actor does not exist");
-        Actor memory actor = actorMap[_id];
-        return (actor.operation, actor.personalDataList);
-    }
-
-    // 检查指定ID的行为人是否存在
-    function actorExists(bytes32 _id) private view returns (bool) {
-        return actorMap[_id].id != 0;
+    function getPurpose(bytes32 _id) public view returns (Operator, string[] memory) {
+        require(purposeMap[_id].id != 0, "Actor does not exist");
+        Purpose storage purpose = purposeMap[_id];
+        return (purpose.operation, purpose.personalDataList);
     }
 }
