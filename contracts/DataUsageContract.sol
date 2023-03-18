@@ -39,13 +39,8 @@ contract DataUsageContract {
 
     // 获取指定行为人的信息
     function getActor(bytes32 _id) public view returns (Operator, string[] memory) {
-        require(actorExists(_id), "Actor does not exist");
+        require(actorMap[_id].id != 0, "Actor does not exist");
         Actor storage actor = actorMap[_id];
         return (actor.operation, actor.personalDataList);
-    }
-
-    // 检查指定ID的行为人是否存在
-    function actorExists(bytes32 _id) private view returns (bool) {
-        return actorMap[_id].id != 0;
     }
 }
