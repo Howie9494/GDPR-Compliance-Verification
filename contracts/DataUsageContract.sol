@@ -31,6 +31,7 @@ contract DataUsageContract {
     function addPurpose(string memory _serviceName, string memory _servicePurpose, Operator _operation, string[] memory _personalDataList) public returns(bytes32) {
         //require(!actorExists(_actorId), "Actor already exists");
         // 拼接 actorId ，serviceName，servicePurpose，operation
+        require(_personalDataList.length <= 256,"The length of the data list cannot exceed 256");
         address actorId = msg.sender;
         bytes32 id = keccak256(abi.encode(actorId, _serviceName, _servicePurpose, _operation));
         purposeMap[id] = Purpose(id, actorId, _serviceName, _servicePurpose, _operation, _personalDataList);
