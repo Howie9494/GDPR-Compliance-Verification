@@ -40,7 +40,7 @@ contract DataUsageContract {
     // 获取指定行为人的信息
     function getActor(bytes32 _id) public view returns (Operator, string[] memory) {
         require(actorExists(_id), "Actor does not exist");
-        Actor memory actor = actorMap[_id];
+        Actor storage actor = actorMap[_id];
         return (actor.operation, actor.personalDataList);
     }
 
