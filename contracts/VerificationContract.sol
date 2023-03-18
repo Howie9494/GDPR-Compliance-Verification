@@ -26,6 +26,7 @@ contract VerificationContract {
         (address logActorId,Operator logOperation, string[] memory processedData,bytes32 contractId) = logContract.getLog(_logId);
         // （1）检查行为人是否符合协议
         (address agreementActorAddress,bool userConsent) = agreementContract.getVote(contractId);
+        (Operator dataUseOperation, string[] memory personalDataList) = dataUsageContract.getPurpose(contractId);
         locked = false;
 
         if (agreementActorAddress != logActorId) {
@@ -34,9 +35,6 @@ contract VerificationContract {
 
         // 日志合同所记录的每个行为者的操作是否符合那些通过数据使用合同记录并通过协议合同获得用户同意的操作
         // 检查操作是否符合数据使用合同 && 检查该行为人是否已经在ProtocolContract中记录了同意
-        locked = true;
-        (Operator dataUseOperation, string[] memory personalDataList) = dataUsageContract.getPurpose(contractId);
-        locked = false;
         if ((dataUseOperation != logOperation) || (!userConsent)) {
             return logActorId;
         } 
