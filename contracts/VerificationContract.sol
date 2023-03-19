@@ -12,6 +12,7 @@ contract VerificationContract {
     LogContract private logContract;
     DataUsageContract private dataUsageContract;  
     bool private locked = false;
+    mapping(string => uint8) init;
 
     constructor(address _agreementContract, address _logContract, address _dataUsageContract) {
         agreementContract = AgreementContract(_agreementContract);
@@ -44,19 +45,33 @@ contract VerificationContract {
         }
 
         // 检查个人数据是否已经被确认
-        if (!CompareArray(personalDataList,processedData)) {
-            return logActorId;
+        if(personalDataList.length <= 59){
+            if (!LoopCompare(personalDataList,processedData)) {
+                return logActorId;
+            }
+        }else{
+            if (!MappingCompare(personalDataList,processedData)) {
+                return logActorId;
+            }
         }
+
         return address(0);
     }
 
-    function CompareArray(string[] memory personalDataList,string[] memory operatedData) internal pure returns(bool){
-        uint bitMap = 0;
+    function LoopCompare(string[] memory personalDataList,string[] memory processedData) internal pure returns(bool){
         require(personalDataList.length <= 256);
-        for(uint i = 0;i < operatedData.length;i++){
+        uint length = personalDataList.length;
+        uint bitMap = 0;
+        bytes32[] memory personalDataBytes = new bytes32[](length);
+        bytes32[] memory processedDataBytes = new bytes32[](length);
+        for(uint i = 0;i < length;i++){
+            personalDataBytes[i] = keccak256(abi.encodePacked(personalDataList[i]));
+            processedDataBytes[i] = keccak256(abi.encodePacked(processedData[i]));
+        }
+        for(uint i = 0;i < processedData.length;i++){
             bool flag = false;
             for(uint j = 0;j < personalDataList.length;j++){
-                if(isEqual(operatedData[i],personalDataList[j]) && (bitMap & (1 << j)) == 0){
+                if(personalDataBytes[i] == processedDataBytes[j] && (bitMap & (1 << j)) == 0){
                     bitMap = bitMap | (1 << j);
                     flag = true;
                     break;
@@ -70,18 +85,25 @@ contract VerificationContract {
         return true;
     }
 
-    function isEqual(string memory str1, string memory str2) internal pure returns (bool) {
-        if(bytes(str1).length != bytes(str2).length){
-            return false;
-        }else if(bytes(str1).length <= 2){
-            bytes memory byteStr1 = bytes(str1);
-            bytes memory byteStr2 = bytes(str2);
-            for(uint i = 0; i < byteStr1.length; i ++) {
-                if(byteStr1[i] != byteStr2[i]) return false;
+    function MappingCompare(string[] memory personalDataList,string[] memory processedData) internal returns(bool){
+        mapping(string => uint8) storage listMap = init;
+        for(uint i = 0;i < personalDataList.length;i++){
+            listMap[personalDataList[i]] += 1;
+        }
+        for(uint i = 0;i < processedData.length;i++){
+            if(listMap[processedData[i]] == 0){
+                clearMapping(listMap,personalDataList);
+                return false;
             }
-            return true;
-        }else{
-            return keccak256(abi.encodePacked(str1)) == keccak256(abi.encodePacked(str2));
+            listMap[processedData[i]] -= 1;
+        }
+        clearMapping(listMap,personalDataList);
+        return true;
+    }
+
+    function clearMapping(mapping(string => uint8) storage listMap,string[] memory personalDataList) internal{
+        for(uint i = 0;i < personalDataList.length;i++){
+            listMap[personalDataList[i]] = 0;
         }
     }
 }
