@@ -1,46 +1,56 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.0;
 
-/**
-该代码实现了一个数据使用合约，用于记录行为人的信息，具体实现如下：
-
-1、定义一个结构体 Actor，用于记录行为人的信息，包括行为人ID、服务名称、服务目的、操作以及个人数据列表。
-2、使用 mapping 存储所有行为人的信息，以行为人ID为索引。
-3、实现了添加新的行为人信息的方法 addActor，用于将新的行为人信息存储在 actorMap 中，添加时需要保证行为人ID不存在。
-4、实现了获取指定行为人的信息的方法 getActor，用于返回指定行为人的详细信息。
-5、实现了一个私有方法 actorExists，用于检查指定ID的行为人是否存在。
-
-*/
 import "./enum.sol";
-    
-contract DataUsageContract {
-    // 行为人结构体，用于记录行为人的信息
+
+/**
+ * @notice DataUsageContract manages data usage purposes for different services.
+ * It contains two methods:
+ * - addPurpose: Adds a new data usage purpose.
+ * - getPurpose: get a data usage purpose by its unique ID.
+ */
+ contract DataUsageContract {
+    /**
+     *  struct to store information related to the data usage purpose.
+     */
     struct Purpose {
-        bytes32 id ; //
-        address actorId; // 行为人地址作为id
-        Operator operation; // 操作  “read”, “write” and “transfer”
-        string serviceName; // 服务名称
-        string servicePurpose; // 服务目的
-        string[] personalDataList; // 个人数据列表
+        bytes32 id; // Unique ID for the data usage purpose
+        address actorId; //Address of the actor who created the purpose
+        Operator operation; //Enum value {READ,WRITE,TRANSFER}
+        string serviceName; //Name of the service associated with the purpose.
+        string servicePurpose; //Description of the purpose for which the service will use the personal data.
+        string[] personalDataList; //Array of personal data items to be used for the specified purpose.
     }
 
-    // 使用 mapping 存储所有行为人的信息，以ID为索引
+    // Mapping to store purposes by their unique ID (bytes32)
     mapping(bytes32 => Purpose) private purposeMap;
 
-    // 添加新的行为人信息
-    function addPurpose(string memory _serviceName, string memory _servicePurpose, Operator _operation, string[] memory _personalDataList) public returns(bytes32) {
-        //require(!actorExists(_actorId), "Actor already exists");
-        // 拼接 actorId ，serviceName，servicePurpose，operation
-        require(_personalDataList.length <= 256,"The length of the data list cannot exceed 256");
+    /**
+     * @notice Adds a new data usage purpose.
+     * @param _serviceName Name of the service.
+     * @param _servicePurpose Description of the purpose.
+     * @param _operation Operator enum value.
+     * @param _personalDataList Array of personal data items.
+     * @return id Unique identifier for the new purpose.
+     */
+    function addPurpose(string memory _serviceName, string memory _servicePurpose, Operator _operation, string[] memory _personalDataList) public returns (bytes32) {
+        // Ensure the data list has no more than 256 elements to prevent excessive data storage.
+        require(_personalDataList.length <= 256, "The length of the data list cannot exceed 256"); 
         address actorId = msg.sender;
+        // Generate a unique ID for the purpose using a hash of the actorId, serviceName, servicePurpose, and operation.
         bytes32 id = keccak256(abi.encode(actorId, _serviceName, _servicePurpose, _operation));
-        purposeMap[id] = Purpose(id, actorId, _operation,_serviceName, _servicePurpose, _personalDataList);
+        purposeMap[id] = Purpose(id, actorId, _operation, _serviceName, _servicePurpose, _personalDataList);
         return id;
     }
 
-    // 获取指定行为人的信息
+    /**
+     * @notice Retrieves information about a data usage purpose by its unique ID.
+     * @param _id Unique identifier for the purpose.
+     * @return operation Operator enum value.
+     * @return personalDataList Array of personal data items.
+     */
     function getPurpose(bytes32 _id) public view returns (Operator, string[] memory) {
-        require(purposeMap[_id].id != 0, "Actor does not exist");
+        require(purposeMap[_id].id != 0, "Purpose does not exist");
         Purpose storage purpose = purposeMap[_id];
         return (purpose.operation, purpose.personalDataList);
     }
