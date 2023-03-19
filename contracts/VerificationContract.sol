@@ -6,27 +6,50 @@ import "./LogContract.sol";
 import "./DataUsageContract.sol";
 import "./enum.sol";
 
+/**
+ * @title VerificationContract
+ * @notice This contract verifies user behavior against agreements, data usage contracts, and logs.
+ * It contains methods to verify a user action and compare personal data with processed data.
+ * The contract uses mappings to associate personal data with a bit map and to clear the mapping after use.
+ */
 contract VerificationContract {
 
+    // AgreementContract instance to retrieve agreement information
     AgreementContract private agreementContract;
+    // LogContract instance to retrieve log information
     LogContract private logContract;
-    DataUsageContract private dataUsageContract;  
+    // DataUsageContract instance to retrieve data usage terms
+    DataUsageContract private dataUsageContract;
+    // Flag to prevent re-entrancy attacks
     bool private locked = false;
-    mapping(string => uint8) init;
+    // Mapping used to initialize a new mapping in the MappingCompare function
+    mapping(string => uint8) emptyMapping;
 
+    /**
+     * @notice Constructor function to set the contract's instances of AgreementContract, LogContract, and DataUsageContract.
+     * @param _agreementContract Address of AgreementContract.
+     * @param _logContract Address of LogContract.
+     * @param _dataUsageContract Address of DataUsageContract.
+     */
     constructor(address _agreementContract, address _logContract, address _dataUsageContract) {
         agreementContract = AgreementContract(_agreementContract);
         logContract = LogContract(_logContract);
         dataUsageContract = DataUsageContract(_dataUsageContract);
     }
 
+    /**
+     * @notice Verifies user behavior against agreements, data usage contracts, and logs.
+     * @param _logId The log ID to verify.
+     * @return The address of the actor that has invalid behavior, or 0 if the behavior is valid.
+     */
     function verify(uint _logId) public returns(address) {
         require(!locked);
         locked = true;
-        // 获取日志信息
+        // get log information
         (address logActorId,Operator logOperation, string[] memory processedData,bytes32 contractId) = logContract.getLog(_logId);
-        // （1）检查行为人是否符合协议
+        // get agreement information
         (address agreementActorAddress,bool userConsent) = agreementContract.getVote(contractId);
+        // get data usage information
         (Operator dataUseOperation, string[] memory personalDataList) = dataUsageContract.getPurpose(contractId);
         locked = false;
 
@@ -34,8 +57,7 @@ contract VerificationContract {
             return logActorId;
         }
 
-        // 日志合同所记录的每个行为者的操作是否符合那些通过数据使用合同记录并通过协议合同获得用户同意的操作
-        // 检查操作是否符合数据使用合同 && 检查该行为人是否已经在ProtocolContract中记录了同意
+        // Check if the logged operation is compliant with the data usage contract and if the user has given consent
         if ((dataUseOperation != logOperation) || (!userConsent)) {
             return logActorId;
         } 
@@ -44,7 +66,7 @@ contract VerificationContract {
             return logActorId;
         }
 
-        // 检查个人数据是否已经被确认
+        // Check if personal data has been verified
         if(personalDataList.length <= 59){
             if (!LoopCompare(personalDataList,processedData)) {
                 return logActorId;
@@ -58,26 +80,33 @@ contract VerificationContract {
         return address(0);
     }
 
-    function LoopCompare(string[] memory personalDataList,string[] memory processedData) internal pure returns(bool){
+    /**
+    * @notice Compares two lists of strings using loops.
+    * This function should only be used for lists with a length of 256 or less.
+    * @param personalDataList The list of personal data.
+    * @param processedData The list of processed data.
+    * @return True if the lists are equal, false otherwise.
+    */
+    function LoopCompare(string[] memory personalDataList, string[] memory processedData) internal pure returns(bool) {
         require(personalDataList.length <= 256);
         uint length = personalDataList.length;
         uint bitMap = 0;
         bytes32[] memory personalDataBytes = new bytes32[](length);
         bytes32[] memory processedDataBytes = new bytes32[](length);
-        for(uint i = 0;i < length;i++){
+        for (uint i = 0; i < length; i++) {
             personalDataBytes[i] = keccak256(abi.encodePacked(personalDataList[i]));
             processedDataBytes[i] = keccak256(abi.encodePacked(processedData[i]));
         }
-        for(uint i = 0;i < processedData.length;i++){
+        for (uint i = 0; i < processedData.length; i++) {
             bool flag = false;
-            for(uint j = 0;j < personalDataList.length;j++){
-                if(personalDataBytes[i] == processedDataBytes[j] && (bitMap & (1 << j)) == 0){
+            for (uint j = 0; j < personalDataList.length; j++) {
+                if (personalDataBytes[i] == processedDataBytes[j] && (bitMap & (1 << j)) == 0) {
                     bitMap = bitMap | (1 << j);
                     flag = true;
                     break;
                 }
             }
-            if(!flag){
+            if (!flag) {
                 return false;
             }
             flag = false;
@@ -85,24 +114,35 @@ contract VerificationContract {
         return true;
     }
 
-    function MappingCompare(string[] memory personalDataList,string[] memory processedData) internal returns(bool){
-        mapping(string => uint8) storage listMap = init;
-        for(uint i = 0;i < personalDataList.length;i++){
+    /**
+    * @notice Compares two lists of strings using a mapping.
+    * @param personalDataList The list of personal data.
+    * @param processedData The list of processed data.
+    * @return True if the lists are equal, false otherwise.
+    */
+    function MappingCompare(string[] memory personalDataList, string[] memory processedData) internal returns(bool) {
+        mapping(string => uint8) storage listMap = emptyMapping;
+        for (uint i = 0; i < personalDataList.length; i++) {
             listMap[personalDataList[i]] += 1;
         }
-        for(uint i = 0;i < processedData.length;i++){
-            if(listMap[processedData[i]] == 0){
-                clearMapping(listMap,personalDataList);
+        for (uint i = 0; i < processedData.length; i++) {
+            if (listMap[processedData[i]] == 0) {
+                clearMapping(listMap, personalDataList);
                 return false;
             }
             listMap[processedData[i]] -= 1;
         }
-        clearMapping(listMap,personalDataList);
+        clearMapping(listMap, personalDataList);
         return true;
     }
 
-    function clearMapping(mapping(string => uint8) storage listMap,string[] memory personalDataList) internal{
-        for(uint i = 0;i < personalDataList.length;i++){
+    /**
+    * @notice Clears a mapping of string to uint8.
+    * @param listMap The mapping to clear.
+    * @param personalDataList The list of personal data used to create the mapping.
+    */
+    function clearMapping(mapping(string => uint8) storage listMap, string[] memory personalDataList) internal {
+        for (uint i = 0; i < personalDataList.length; i++) {
             listMap[personalDataList[i]] = 0;
         }
     }
