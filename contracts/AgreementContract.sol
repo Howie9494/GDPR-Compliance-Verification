@@ -21,6 +21,7 @@ contract AgreementContract {
     }
 
     function getVote(bytes32 _id) public view returns (address,bool){
+        require(voteMap[_id].id != 0, "Vote does not exist");
         Vote storage vt = voteMap[_id];
         return (vt.actorAddress,vt.userConsent); // 返回投票信息及行为人地址
     }

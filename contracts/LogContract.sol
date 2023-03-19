@@ -18,12 +18,13 @@ contract LogContract {
     // 存储所有的日志信息，mapping结构，将日志ID映射到LogEntry结构体类型
     mapping(uint => LogEntry) private logList;
 
-    event record(uint _id,address _actorId,Operator _operation,string[] _operatedData,string _serviceName,bytes32 _contractId);
+    event record(uint indexed _id,address indexed _actorId,Operator _operation,string[] _operatedData,string _serviceName,bytes32 _contractId);
 
-    uint currentLog = 0;
+    uint private currentLog = 0;
 
     // 添加新的日志信息
     function logAction(address _actorId,Operator _operation, string[] memory _processedData, string memory _serviceName,bytes32 _contractId) public returns(uint){
+        require(_processedData.length <= 256,"The length of the processed data cannot exceed 256");
         ++currentLog;
         logList[currentLog] = LogEntry(currentLog,_actorId,_operation, _processedData, _serviceName,_contractId); // 将新的日志加入mapping
         emit record(currentLog,_actorId,_operation, _processedData, _serviceName,_contractId);
