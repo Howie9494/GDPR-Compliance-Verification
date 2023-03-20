@@ -100,7 +100,8 @@ The non-functional test in this project will be tested and elaborated from 5 asp
 - Ease of use
 - Scalability
 - reliability
-- Gas consumption
+  - Gas consumption
+
 
 ## 4.	Security Testing
 
