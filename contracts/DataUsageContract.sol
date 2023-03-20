@@ -16,6 +16,7 @@ import "./enum.sol";
     struct Purpose {
         bytes32 id; // Unique ID for the data usage purpose
         address actorId; //Address of the actor who created the purpose
+        address dataOwner; //Address of the data list owner
         Operator operation; //Enum value {READ,WRITE,TRANSFER}
         string serviceName; //Name of the service associated with the purpose.
         string servicePurpose; //Description of the purpose for which the service will use the personal data.
@@ -33,13 +34,13 @@ import "./enum.sol";
      * @param _personalDataList Array of personal data items.
      * @return id Unique identifier for the new purpose.
      */
-    function addPurpose(string memory _serviceName, string memory _servicePurpose, Operator _operation, string[] memory _personalDataList) public returns (bytes32) {
+    function addPurpose(address dataOwner,string memory _serviceName, string memory _servicePurpose, Operator _operation, string[] memory _personalDataList) public returns (bytes32) {
         // Ensure the data list has no more than 256 elements to prevent excessive data storage.
         require(_personalDataList.length <= 256, "The length of the data list cannot exceed 256"); 
         address actorId = msg.sender;
         // Generate a unique ID for the purpose using a hash of the actorId, serviceName, servicePurpose, and operation.
         bytes32 id = keccak256(abi.encode(actorId, _serviceName, _servicePurpose, _operation));
-        purposeMap[id] = Purpose(id, actorId, _operation, _serviceName, _servicePurpose, _personalDataList);
+        purposeMap[id] = Purpose(id, actorId, dataOwner, _operation, _serviceName, _servicePurpose, _personalDataList);
         return id;
     }
 
@@ -53,5 +54,16 @@ import "./enum.sol";
         require(purposeMap[_id].id != 0, "Purpose does not exist");
         Purpose storage purpose = purposeMap[_id];
         return (purpose.operation, purpose.personalDataList);
+    }
+
+    function getDataOwner(bytes32 _id) public view returns (address) {
+        require(purposeMap[_id].id != 0, "Purpose does not exist");
+        return purposeMap[_id].dataOwner;
+    }
+
+    function getPurposeDetail(bytes32 _id) public view returns (bytes32,address,address,Operator,string memory,string memory,string[] memory) {
+        require(purposeMap[_id].id != 0, "Purpose does not exist");
+        Purpose storage purpose = purposeMap[_id];
+        return (purpose.id,purpose.actorId,purpose.dataOwner,purpose.operation,purpose.serviceName,purpose.servicePurpose,purpose.personalDataList);
     }
 }
