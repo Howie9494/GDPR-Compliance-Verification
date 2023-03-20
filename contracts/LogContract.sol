@@ -40,7 +40,7 @@ contract LogContract {
      * @param _contractId Unique identifier of the associated DataUsageContract.
      * @return logId Unique identifier for the newly created log entry.
      */
-    function logAction(address _actorId, Operator _operation, string[] memory _processedData, string memory _serviceName, bytes32 _contractId) public returns (uint) {
+    function logAction(address _actorId, Operator _operation, string[] memory _processedData, string memory _serviceName, bytes32 _contractId) public returns (uint logId) {
         // Ensure the processed data list has no more than 256 elements to prevent excessive data storage.
         require(_processedData.length <= 256, "The length of the processed data cannot exceed 256");
         currentLog++;
@@ -57,7 +57,7 @@ contract LogContract {
      * @return processedData Array of processed data items.
      * @return contractId Unique identifier of the associated DataUsageContract.
      */
-    function getLog(uint _id) public view returns (address, Operator, string[] memory, bytes32) {
+    function getLog(uint _id) public view returns (address actorId, Operator operation, string[] memory processedData, bytes32 contractId) {
         require(logList[_id].id != 0, "Log does not exist");
         LogEntry storage log = logList[_id];
         return (log.actorId, log.operation, log.processedData, log.contractId);

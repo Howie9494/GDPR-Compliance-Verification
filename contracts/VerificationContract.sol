@@ -40,9 +40,9 @@ contract VerificationContract {
     /**
      * @notice Verifies user behavior against agreements, data usage contracts, and logs.
      * @param _logId The log ID to verify.
-     * @return The address of the actor that has invalid behavior, or 0 if the behavior is valid.
+     * @return actorId The address of the actor that has invalid behavior, or 0 if the behavior is valid.
      */
-    function verify(uint _logId) public returns(address) {
+    function verify(uint _logId) public returns(address actorId) {
         require(!locked);
         locked = true;
         // get log information
@@ -85,9 +85,9 @@ contract VerificationContract {
     * This function should only be used for lists with a length of 256 or less.
     * @param personalDataList The list of personal data.
     * @param processedData The list of processed data.
-    * @return True if the lists are equal, false otherwise.
+    * @return flag True if the lists are equal, false otherwise.
     */
-    function LoopCompare(string[] memory personalDataList, string[] memory processedData) internal pure returns(bool) {
+    function LoopCompare(string[] memory personalDataList, string[] memory processedData) internal pure returns(bool flag) {
         require(personalDataList.length <= 256);
         uint length = personalDataList.length;
         uint bitMap = 0;
@@ -98,7 +98,7 @@ contract VerificationContract {
             processedDataBytes[i] = keccak256(abi.encodePacked(processedData[i]));
         }
         for (uint i = 0; i < processedData.length; i++) {
-            bool flag = false;
+            flag = false;
             for (uint j = 0; j < personalDataList.length; j++) {
                 if (personalDataBytes[i] == processedDataBytes[j] && (bitMap & (1 << j)) == 0) {
                     bitMap = bitMap | (1 << j);
@@ -118,9 +118,9 @@ contract VerificationContract {
     * @notice Compares two lists of strings using a mapping.
     * @param personalDataList The list of personal data.
     * @param processedData The list of processed data.
-    * @return True if the lists are equal, false otherwise.
+    * @return flag True if the lists are equal, false otherwise.
     */
-    function MappingCompare(string[] memory personalDataList, string[] memory processedData) internal returns(bool) {
+    function MappingCompare(string[] memory personalDataList, string[] memory processedData) internal returns(bool flag) {
         mapping(string => uint8) storage listMap = emptyMapping;
         for (uint i = 0; i < personalDataList.length; i++) {
             listMap[personalDataList[i]] += 1;
