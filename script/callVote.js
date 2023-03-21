@@ -9,7 +9,7 @@ const privateKey = '83587aef51dfa1653f2f62cfab03dbf224eed84ee4a95912b9bc692ddd81
 const agreementContractPath = path.resolve(__dirname,'../build','contracts_AgreementContract_sol_AgreementContract.abi');
 const agreementAbi = fs.readJsonSync(agreementContractPath,'utf-8');
 
-const agreementContractAddressPath = path.resolve(__dirname,'../build','VerificationContract.txt');
+const agreementContractAddressPath = path.resolve(__dirname,'../build','AgreementContract.txt');
 const agreementContractAddress = fs.readFileSync(agreementContractAddressPath,'utf-8');
 
 // // Create a contract instance
@@ -27,7 +27,7 @@ async function vote() {
     const nonce = await web3.eth.getTransactionCount(account);
 
     const signedTransaction = await web3.eth.accounts.signTransaction({
-        to: contractAddress,
+        to: agreementContractAddress,
         data: data,
         gas: gas,
         nonce: nonce,

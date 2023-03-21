@@ -7,7 +7,8 @@ const abi = fs.readJsonSync(contractPath,'utf-8');
 const web3 = new Web3('https://goerli.infura.io/v3/8ace39a5a8ab475eb44a15774dc5a293');
 
 // // Replace with your deployed contract address
-const contractAddress = '0x317f07219C159F22d19f23cEb3B375d891a367b4';
+const logContractAddressPath = path.resolve(__dirname,'../build','LogContract.txt');
+const contractAddress = fs.readFileSync(logContractAddressPath,'utf-8');
 
 const account = '0x910DFBB7e9298Df687827561453342Cb8781C03C';
 
