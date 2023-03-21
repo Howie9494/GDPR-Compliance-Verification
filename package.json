@@ -1,0 +1,25 @@
+{
+  "name": "gdpr-compliance-verification",
+  "version": "1.0.0",
+  "description": "Blockchain-based GDPR Compliance Verification",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Howie9494/GDPR-Compliance-Verification.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Howie9494/GDPR-Compliance-Verification/issues"
+  },
+  "homepage": "https://github.com/Howie9494/GDPR-Compliance-Verification#readme",
+  "dependencies": {
+    "ethers": "^6.1.0",
+    "fs-extra": "^11.1.0",
+    "solc": "^0.8.19",
+    "web3": "^1.8.2"
+  }
+}
