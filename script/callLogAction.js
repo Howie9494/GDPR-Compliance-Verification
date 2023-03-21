@@ -1,7 +1,7 @@
 const Web3 = require('web3');
 const path = require('path');
 const fs = require('fs-extra');
-//const EthCrypto = require('eth-crypto');
+const EthCrypto = require('eth-crypto');
 
 const contractPath = path.resolve(__dirname,'../build','contracts_LogContract_sol_LogContract.abi');
 const abi = fs.readJsonSync(contractPath,'utf-8');
@@ -26,9 +26,9 @@ async function logAction(contractId) {
     const processedData = ['gyj', 'test'];
     const serviceName = '111';
 
-    //const publicKey = EthCrypto.publicKeyByPrivateKey(privateKey);
-    //const encryptedProcessedData = await encryptData(processedData, publicKey);
-    const logActionFunction = logContract.methods.logAction(actorId, operation, processedData,serviceName,contractId);
+    const publicKey = EthCrypto.publicKeyByPrivateKey(privateKey);
+    const encryptedProcessedData = await encryptData(processedData, publicKey);
+    const logActionFunction = logContract.methods.logAction(actorId, operation, encryptedProcessedData,serviceName,contractId);
     const gas = await logActionFunction.estimateGas({ from: account });
     const data = logActionFunction.encodeABI();
     const nonce = await web3.eth.getTransactionCount(account);
@@ -42,19 +42,19 @@ async function logAction(contractId) {
     }, privateKey);
 
     const transactionReceipt = await web3.eth.sendSignedTransaction(signedTransaction.rawTransaction);
-    console.log('Transaction receipt:', transactionReceipt);
+    //console.log('Transaction receipt:', transactionReceipt);
 }
 
-// async function encryptData(personalDataList, publicKey) {
-//     const encryptedDataList = [];
+async function encryptData(personalDataList, publicKey) {
+    const encryptedDataList = [];
   
-//     for (const data of personalDataList) {
-//       const encryptedData = await EthCrypto.encryptWithPublicKey(publicKey, data);
-//       encryptedDataList.push(EthCrypto.cipher.stringify(encryptedData));
-//     }
+    for (const data of personalDataList) {
+      const encryptedData = await EthCrypto.encryptWithPublicKey(publicKey, data);
+      encryptedDataList.push(EthCrypto.cipher.stringify(encryptedData));
+    }
   
-//     return encryptedDataList;
-// }
+    return encryptedDataList;
+}
 
 var arguments = process.argv.slice(2);
 if(!arguments[0]){

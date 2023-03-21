@@ -18,7 +18,7 @@ const privateKey = '83587aef51dfa1653f2f62cfab03dbf224eed84ee4a95912b9bc692ddd81
 const dataUsageContract = new web3.eth.Contract(abi, contractAddress);
 
 async function addPurpose() {
-    const serviceName = 'CSC82233';
+    const serviceName = 'CSC82333';
     const servicePurpose = 'read';
     const operation = 2; // Assuming 'read' is 1 in the enum
     const personalDataList = ['gyj', 'test'];

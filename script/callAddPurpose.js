@@ -26,27 +26,25 @@ async function addPurpose() {
     const personalDataList = ['gyj', 'test'];
     const dataOwner = '0x910DFBB7e9298Df687827561453342Cb8781C03C';
 
-    //const publicKey = EthCrypto.publicKeyByPrivateKey(privateKey);
-    //const encryptedDataList = await encryptData(personalDataList, publicKey);
-    const addPurposeFunction = dataUsageContract.methods.addPurpose(dataOwner,serviceName, servicePurpose, operation, personalDataList);
-    // const gas = await addPurposeFunction.estimateGas({ from: account });
-    // const data = addPurposeFunction.encodeABI();
-    // const nonce = await web3.eth.getTransactionCount(account);
+    const publicKey = EthCrypto.publicKeyByPrivateKey(privateKey);
+    const encryptedDataList = await encryptData(personalDataList, publicKey);
+    const addPurposeFunction = dataUsageContract.methods.addPurpose(dataOwner,serviceName, servicePurpose, operation, encryptedDataList);
+    const gas = await addPurposeFunction.estimateGas({ from: account });
+    const data = addPurposeFunction.encodeABI();
+    const nonce = await web3.eth.getTransactionCount(account);
 
-    // const signedTransaction = await web3.eth.accounts.signTransaction({
-    //     to: contractAddress,
-    //     data: data,
-    //     gas: gas,
-    //     nonce: nonce,
-    //     chainId: 5 
-    // }, privateKey);
+    const signedTransaction = await web3.eth.accounts.signTransaction({
+        to: contractAddress,
+        data: data,
+        gas: gas,
+        nonce: nonce,
+        chainId: 5 
+    }, privateKey);
 
-    //const transactionReceipt = await web3.eth.sendSignedTransaction(signedTransaction.rawTransaction);
+    const transactionReceipt = await web3.eth.sendSignedTransaction(signedTransaction.rawTransaction);
 
     addPurposeFunction.call({from:account},function(err,res){
         console.log(res);
-        //vote(res);
-        //logAction(res);
     })
     // console.log('Transaction receipt:', transactionReceipt);
 }

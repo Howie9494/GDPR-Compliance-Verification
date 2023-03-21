@@ -1,7 +1,7 @@
 const Web3 = require('web3');
 const path = require('path');
 const fs = require('fs-extra');
-//const EthCrypto = require('eth-crypto');
+const EthCrypto = require('eth-crypto');
 
 const web3 = new Web3('https://goerli.infura.io/v3/8ace39a5a8ab475eb44a15774dc5a293');
 const account = '0x910DFBB7e9298Df687827561453342Cb8781C03C';
@@ -33,11 +33,11 @@ async function retrieve(contractId) {
 
     // const transactionReceipt = await web3.eth.sendSignedTransaction(signedTransaction.rawTransaction);
 
-    retrieveFunction.call({from:account},function(err,res){
+    retrieveFunction.call({from:account},async function(err,res){
         if(!err){
             console.log(res);
-            // const decryptedDataList = await decryptData(res['personalDataList'],privateKey);
-            // console.log("The decrypted personalDataList is:",decryptedDataList);
+            const decryptedDataList =await decryptData(res['personalDataList'],privateKey);
+            console.log("The decrypted personalDataList is:",decryptedDataList);
         }else{
             console.log(err);
         }
@@ -45,17 +45,17 @@ async function retrieve(contractId) {
     // console.log('Transaction receipt:', transactionReceipt);
 }
 
-// async function decryptData(encryptedDataList, privateKey) {
-//     const decryptedDataList = [];
+async function decryptData(encryptedDataList, privateKey) {
+    const decryptedDataList = [];
   
-//     for (const encryptedDataString of encryptedDataList) {
-//       const encryptedData = EthCrypto.cipher.parse(encryptedDataString);
-//       const decryptedData = await EthCrypto.decryptWithPrivateKey(privateKey, encryptedData);
-//       decryptedDataList.push(decryptedData);
-//     }
+    for (const encryptedDataString of encryptedDataList) {
+      const encryptedData = EthCrypto.cipher.parse(encryptedDataString);
+      const decryptedData = await EthCrypto.decryptWithPrivateKey(privateKey, encryptedData);
+      decryptedDataList.push(decryptedData);
+    }
   
-//     return decryptedDataList;
-// }
+    return decryptedDataList;
+}
 
 var arguments = process.argv.slice(2);
 if(!arguments[0]){

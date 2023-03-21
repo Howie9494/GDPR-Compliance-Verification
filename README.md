@@ -24,3 +24,6 @@ AgreementContract.vote() <=> callVote.js [contractId] [userConsent]
 AgreementContract.editVote() <=> callEditVote.js [contractId] [userConsent]
 LogContract.logAction() <=> callLogAction.js [contractId]
 VerificationContract.verify() <=> callVerify.js [logId]
+
+Monitor
+monitor.js
