@@ -53,6 +53,7 @@ contract AgreementContract {
      * @param _userConsent User's consent to the agreement (true = consent, false = reject).
      */
     function vote(bytes32 _id, address _hashAddress, address _actorAddress, bool _userConsent) public {
+        require(voteMap[_id].id == 0, "Modify a vote using editVote");
         address _userId = msg.sender;
         require(!locked);
         locked = true;
