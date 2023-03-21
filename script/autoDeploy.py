@@ -1,5 +1,11 @@
 import asyncio
 import subprocess
+import time
+
+
+def get_time():
+    current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+    return current_time
 
 
 async def run_command(cmd):
@@ -18,19 +24,24 @@ async def run_command(cmd):
 
 
 async def main():
-    print("Start to compile\t")
-    await run_command("solcjs --base-path ./  ../contracts/DataUsageContract.sol --abi --bin -o build")
-    await run_command("solcjs --base-path ./  ../contracts/AgreementContract.sol --abi --bin -o build")
-    await run_command("solcjs --base-path ./  ../contracts/LogContract.sol --abi --bin -o build")
-    await run_command("solcjs --base-path ./  ../contracts/VerificationContract.sol --abi --bin -o build")
-    print("End of compilation\t")
-    print("=" * 20)
-    print("Start to deploy\t")
-    await run_command("node ./DataUsageDeploy.js")
-    await run_command("node ./AgreementDeploy.js")
-    await run_command("node ./LogContractDeploy.js")
-    await run_command("node ./VerificationDeploy.js")
-    print("End of compilation")
+    print(f"{get_time()}Start to compile")
+    print("\t")
+    await run_command("solcjs --base-path ./  ./contracts/DataUsageContract.sol --abi --bin -o build")
+    await run_command("solcjs --base-path ./  ./contracts/AgreementContract.sol --abi --bin -o build")
+    await run_command("solcjs --base-path ./  ./contracts/LogContract.sol --abi --bin -o build")
+    await run_command("solcjs --base-path ./  ./contracts/VerificationContract.sol --abi --bin -o build")
+    print(f"{get_time()}End of compilation")
+    print("\t")
+    print("=" * 30)
+    print("\t")
+    print(f"{get_time()}Start to deploy\t")
+    print("\t")
+    await run_command("node ./script/DataUsageDeploy.js")
+    await run_command("node ./script/AgreementDeploy.js")
+    await run_command("node ./script/LogContractDeploy.js")
+    await run_command("node ./script/VerificationDeploy.js")
+    print(f"{get_time()}End of compilation")
+    print("\t")
 
 
 asyncio.run(main())
