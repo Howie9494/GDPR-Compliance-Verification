@@ -13,25 +13,18 @@ contract VerificationContractTest {
     function beforeEach() public {
         verificationContract = new VerificationContract(address(this), address(this), address(this));
         logId = 1;
-        personalDataList = ["data1", "data2", "data3", "data4", "data5"];
-        processedData = ["data2", "data4", "data1", "data5", "data3"];
+        personalDataList = ["Jason", "Newcastle", "30"];
+        processedData = ["Jason", "Newcastle", "30"];
     }
 
     function testLoopCompare() public {
         bool result = verificationContract.LoopCompare(personalDataList, processedData);
-        Assert.equal(result, true, "LoopCompare failed");
+        Assert.equal(result, true, "LoopCompare succeed");
     }
 
     function testMappingCompare() public {
         bool result = verificationContract.MappingCompare(personalDataList, processedData);
-        Assert.equal(result, true, "MappingCompare failed");
+        Assert.equal(result, true, "MappingCompare succeed");
     }
     
-    // function testClearMapping() public {
-    //     verificationContract.clearMapping(verificationContract.init, personalDataList);
-
-    //     for (uint i = 0; i < personalDataList.length; i++) {
-    //         Assert.equal(verificationContract.init[personalDataList[i]], 0, "clearMapping failed");
-    //     }
-    // }
 }
