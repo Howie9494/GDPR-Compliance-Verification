@@ -14,9 +14,9 @@ async def run_command(cmd):
     )
     stdout, stderr = await process.communicate()
     if len(stdout) != 0:
-        print(f"Success: {stdout.decode()}")
+        print(f"[{get_time()}] Success: {stdout.decode()}")
     elif len(stderr) != 0:
-        print(f"Error: {stderr.decode()}")
+        print(f"[{get_time()}] Error: {stderr.decode()}")
     else:
         pass
 
@@ -24,23 +24,21 @@ async def run_command(cmd):
 
 
 async def main():
-    print(f"{get_time()}Start to compile")
+    print(f"[{get_time()}] Start to compile")
     print("\t")
     await run_command("solcjs --base-path ./  ./contracts/DataUsageContract.sol --abi --bin -o build")
     await run_command("solcjs --base-path ./  ./contracts/AgreementContract.sol --abi --bin -o build")
     await run_command("solcjs --base-path ./  ./contracts/LogContract.sol --abi --bin -o build")
     await run_command("solcjs --base-path ./  ./contracts/VerificationContract.sol --abi --bin -o build")
-    print(f"{get_time()}End of compilation")
+    print(f"[{get_time()}] End of compilation")
     print("\t")
-    print("=" * 30)
-    print("\t")
-    print(f"{get_time()}Start to deploy\t")
+    print(f"[{get_time()}] Start to deploy\t")
     print("\t")
     await run_command("node ./script/DataUsageDeploy.js")
     await run_command("node ./script/AgreementDeploy.js")
     await run_command("node ./script/LogContractDeploy.js")
     await run_command("node ./script/VerificationDeploy.js")
-    print(f"{get_time()}End of compilation")
+    print(f"[{get_time()}] End of compilation")
     print("\t")
 
 
