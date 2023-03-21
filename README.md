@@ -43,3 +43,8 @@
 `LogContract.logAction() <=> callLogAction.js [contractId]`
 
 `VerificationContract.verify() <=> callVerify.js [logId]`
+
+
+## Auto-Deploy
+
+`python .\script\autoDeploy.py  `
