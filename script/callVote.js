@@ -15,11 +15,9 @@ const agreementContractAddress = fs.readFileSync(agreementContractAddressPath,'u
 // // Create a contract instance
 const agreementContract = new web3.eth.Contract(agreementAbi, agreementContractAddress);
 
-async function vote() {
-    const contractId = '0xa65d1861820be6e946780f9338bce97157b83d17808dbe8a97c32c50e11b8135';
+async function vote(contractId,userConsent) {
     const hashAddress = '0x910DFBB7e9298Df687827561453342Cb8781C03C';
     const actorAddress = '0x910DFBB7e9298Df687827561453342Cb8781C03C';
-    const userConsent = true;
 
     const voteFunction = agreementContract.methods.vote(contractId,hashAddress,actorAddress,userConsent);
     const gas = await voteFunction.estimateGas({ from: account });
@@ -45,4 +43,10 @@ async function vote() {
     })
     // console.log('Transaction receipt:', transactionReceipt);
 }
-vote();
+
+var arguments = process.argv.slice(2);
+if(!arguments[0] && !arguments[1]){
+    console.log('contractId must be entered');
+    return;
+}
+vote(arguments[0],arguments[1]);

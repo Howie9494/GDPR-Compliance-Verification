@@ -1,6 +1,8 @@
 const Web3 = require('web3');
 const path = require('path');
 const fs = require('fs-extra');
+//const EthCrypto = require('eth-crypto');
+
 const contractPath = path.resolve(__dirname,'../build','contracts_LogContract_sol_LogContract.abi');
 const abi = fs.readJsonSync(contractPath,'utf-8');
 // // Replace with your Goerli Infura endpoint
@@ -18,13 +20,14 @@ const privateKey = '83587aef51dfa1653f2f62cfab03dbf224eed84ee4a95912b9bc692ddd81
 // // Create a contract instance
 const logContract = new web3.eth.Contract(abi, contractAddress);
 
-async function logAction() {
+async function logAction(contractId) {
     const actorId = '0x910DFBB7e9298Df687827561453342Cb8781C03C';
     const operation = 1; // Assuming 'read' is 1 in the enum
     const processedData = ['gyj', 'test'];
     const serviceName = '111';
-    const contractId = '0x94293646d7039a850545ec2fcad2e046de63f1f97ada387684809a92322e5f8f';
 
+    //const publicKey = EthCrypto.publicKeyByPrivateKey(privateKey);
+    //const encryptedProcessedData = await encryptData(processedData, publicKey);
     const logActionFunction = logContract.methods.logAction(actorId, operation, processedData,serviceName,contractId);
     const gas = await logActionFunction.estimateGas({ from: account });
     const data = logActionFunction.encodeABI();
@@ -42,4 +45,20 @@ async function logAction() {
     console.log('Transaction receipt:', transactionReceipt);
 }
 
-logAction();
+// async function encryptData(personalDataList, publicKey) {
+//     const encryptedDataList = [];
+  
+//     for (const data of personalDataList) {
+//       const encryptedData = await EthCrypto.encryptWithPublicKey(publicKey, data);
+//       encryptedDataList.push(EthCrypto.cipher.stringify(encryptedData));
+//     }
+  
+//     return encryptedDataList;
+// }
+
+var arguments = process.argv.slice(2);
+if(!arguments[0]){
+    console.log('contractId must be entered');
+    return;
+}
+logAction(arguments[0]);

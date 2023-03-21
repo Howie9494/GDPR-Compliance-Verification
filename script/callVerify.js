@@ -38,4 +38,9 @@ async function verify(logId) {
     });
 }
 
-verify(7);
+var arguments = process.argv.slice(2);
+if(!arguments[0]){
+    console.log('contractId must be entered');
+    return;
+}
+verify(arguments[0]);

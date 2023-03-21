@@ -17,8 +17,11 @@
   },
   "homepage": "https://github.com/Howie9494/GDPR-Compliance-Verification#readme",
   "dependencies": {
+    "encoding": "^0.1.13",
+    "eth-crypto": "^2.6.0",
     "ethers": "^6.1.0",
     "fs-extra": "^11.1.0",
+    "node": "^19.8.1",
     "solc": "^0.8.19",
     "web3": "^1.8.2"
   }
