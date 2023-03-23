@@ -31,7 +31,6 @@ var recordEvent = ClientReceipt.events.record({
     if(!error){
         let logId = event['returnValues'][0];
         verify(logId);
-        console.log('Validation complete');
     }else{
         console.log(error);
     } 
@@ -46,6 +45,7 @@ const verificationContract = fs.readFileSync(verificationContractAddress,'utf-8'
 const VerificationContract = new web3.eth.Contract(verificationAbi, verificationContract);
 
 async function verify(logId) {
+    console.log('Validation begin');
     const verifyFunction = VerificationContract.methods.verify(logId);
     const gas = await verifyFunction.estimateGas({ from: account });
     const data = verifyFunction.encodeABI();
@@ -60,6 +60,7 @@ async function verify(logId) {
     }, privateKey);
 
     const transactionReceipt = await web3.eth.sendSignedTransaction(signedTransaction.rawTransaction);
+    console.log('Validation complete');
     //console.log('Transaction receipt:', transactionReceipt);
     verifyFunction.call({from:account},function(err,res){
         if(!err){

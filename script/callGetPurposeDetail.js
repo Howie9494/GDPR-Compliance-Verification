@@ -12,9 +12,6 @@ const contractAddress = fs.readFileSync(dataUsageContractAddressPath,'utf-8');
 
 const account = '0x910DFBB7e9298Df687827561453342Cb8781C03C';
 
-// // Replace with your account private key (remove the leading 0x)
-const privateKey = '83587aef51dfa1653f2f62cfab03dbf224eed84ee4a95912b9bc692ddd81da47';
-
 // // Create a contract instance
 const dataUsageContract = new web3.eth.Contract(abi, contractAddress);
 

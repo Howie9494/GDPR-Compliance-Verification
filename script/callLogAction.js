@@ -12,6 +12,7 @@ const web3 = new Web3('https://goerli.infura.io/v3/8ace39a5a8ab475eb44a15774dc5a
 const logContractAddressPath = path.resolve(__dirname,'../build','LogContract.txt');
 const contractAddress = fs.readFileSync(logContractAddressPath,'utf-8');
 
+const publicKeyPath = path.resolve(__dirname,'../build','publicKey.txt');
 const account = '0x910DFBB7e9298Df687827561453342Cb8781C03C';
 
 // // Replace with your account private key (remove the leading 0x)
@@ -26,7 +27,7 @@ async function logAction(contractId) {
     const processedData = ['gyj', 'test'];
     const serviceName = '111';
 
-    const publicKey = EthCrypto.publicKeyByPrivateKey(privateKey);
+    const publicKey = fs.readFileSync(publicKeyPath,'utf-8');
     const encryptedProcessedData = await encryptData(processedData, publicKey);
     const logActionFunction = logContract.methods.logAction(actorId, operation, encryptedProcessedData,serviceName,contractId);
     const gas = await logActionFunction.estimateGas({ from: account });
