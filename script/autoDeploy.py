@@ -38,7 +38,7 @@ async def main():
     await run_command("node ./script/AgreementDeploy.js")
     await run_command("node ./script/LogContractDeploy.js")
     await run_command("node ./script/VerificationDeploy.js")
-    print(f"[{get_time()}] End of compilation")
+    print(f"[{get_time()}] End of deployment")
     print("\t")
 
 
